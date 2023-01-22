@@ -1,0 +1,103 @@
+﻿@model LibraryManagementSystem.ViewModels.ReaderSearchViewModel
+
+@{
+    ViewBag.Title = "Readers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var model = Model.Readers;
+}
+
+<h2>Readers</h2>
+@Html.ActionLink("New Reader", "NewReader", "Readers", null, new { @class = "btn btn-primary mb-2" })
+<br />
+<!--Filter Search-->
+<button class="btn btn-outline-secondary btn-sm float-end" data-bs-toggle="collapse" data-bs-target="#searchform">Filter</button>
+@using (Html.BeginForm("Index", "Readers", FormMethod.Post, new { @class = "bg-primary bg-opacity-10 collapse my-3", id = "searchform" }))
+{
+    <div class="d-inline-flex">
+        <div class="form-group mx-2">
+            @Html.LabelFor(m => m.Name)
+            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+        </div>
+        <div class="form-group mx-2">
+            @Html.LabelFor(m => m.Email)
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+        </div>
+        <div class="form-group mx-2">
+            @Html.LabelFor(m => m.currentlyBorrowedBook) <br />
+            @Html.CheckBoxFor(m => m.currentlyBorrowedBook)
+        </div>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-outline-secondary btn-sm m-2">Search</button>
+}
+
+<!--Data Table-->
+@if (!model.Any())
+{
+    <p>No Reader!</p>
+}
+else
+{
+    <table class="table table-bordered table-hover" id="readers">
+        <thead>
+            <tr>
+                <th>Reader</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reader in model)
+            {
+                <tr>
+                    <td>@Html.ActionLink(reader.Name, "Details", "Readers", new { id = reader.Id }, new { @class = "text-decoration-none" })</td>
+                    <td>
+                        @Html.ActionLink("View Loan Record", "ViewLoanRecord", "Readers", new { id = reader.Id, }, new { @class = "btn btn-primary" })
+                        @Html.ActionLink("Edit Reader", "Edit", "Readers", new { id = reader.Id, }, new { @class = "btn btn-primary" })
+                        <button data-reader-id="@reader.Id" class="btn btn-danger js-delete">Delete Reader</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+
+
+
+@section scripts
+    {
+    <script>
+        $(document).ready(function () {
+            var myDataTable = $("#readers").DataTable();
+
+            $("#readers .js-delete").on("click", function () {
+                var button = $(this);
+                var result = confirm('Are you sure you wish to delete this reader?');
+                if (result) {
+                    var form = $('#__AjaxAntiForgeryForm');
+                    var token = $('input[name="__RequestVerificationToken"]', form).val();
+                    $.ajax({
+                        url: "/Readers/Delete/" + button.attr("data-reader-id"),
+                        method: "POST",
+                        data: {
+                            __RequestVerificationToken: token
+                        },
+                        success: function () {
+                            myDataTable.row(button.parents("tr")).remove().draw();
+                        },
+                        statusCode: {
+                            500: function () {
+                                myDataTable.row(button.parents("tr")).remove().draw(false);
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+    </script>
+}

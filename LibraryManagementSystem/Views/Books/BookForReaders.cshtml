@@ -1,0 +1,22 @@
+﻿@model LibraryManagementSystem.ViewModels.BookForReadersViewModel
+@{
+    ViewBag.Title = "Book For Readers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>@Model.Book.Name</h2>
+@if (Model.Readers.Count == 0)
+{
+    <p>No Readers Borrowed This Book Yet.</p>
+}
+else
+{
+    <ul>
+        @foreach (var reader in Model.Readers)
+        {
+            <ul>
+                <li>@reader.Id &#09; @reader.Name</li>
+            </ul>
+        }
+    </ul>
+}
+

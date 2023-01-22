@@ -1,0 +1,66 @@
+﻿@model LibraryManagementSystem.ViewModels.BookViewModel
+@{
+    ViewBag.Title = "New / Edit Book";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var imagePath = "/UploadedFiles/" + Model.Book.FilePath;
+}
+
+<h2>@ViewBag.Message</h2>
+
+@using (Html.BeginForm("Save", "Books", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary(true, "Please Fix the following errors: ")
+    <div class="form-group">
+        @Html.LabelFor(m => m.Book.Name)
+        @Html.TextBoxFor(m => m.Book.Name, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Book.Name)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Book.Author)
+        @Html.TextBoxFor(m => m.Book.Author, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Book.Author)
+
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Book.ISBN)
+        @Html.TextBoxFor(m => m.Book.ISBN, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Book.ISBN)
+
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Book.NumberInStock)
+        @Html.TextBoxFor(m => m.Book.NumberInStock, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Book.NumberInStock)
+
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Book.BookTypeId)
+        @Html.DropDownListFor(m => m.Book.BookTypeId, new SelectList(Model.BookTypes, "Id", "Type"), "Select a Book Type: ", new { @class = "form-control text-dark" })
+        @Html.ValidationMessageFor(m => m.Book.BookTypeId)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Image) <br />
+        @*<input type="file" name="Book.Image" /> <br />*@
+        @Html.TextBoxFor(m => m.Image, new { @type = "file" })
+        @Html.ValidationMessageFor(m => m.Image) <br />
+
+    </div>
+    if(!String.IsNullOrEmpty(Model.Book.FilePath))
+    {
+        <img src=@imagePath width="100" /> <br />
+    }
+
+    @Html.HiddenFor(m => m.Book.Id)
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-primary">Save</button>
+    @section scripts{
+        @Scripts.Render("~/bundles/jqueryval")
+    }
+
+}
+

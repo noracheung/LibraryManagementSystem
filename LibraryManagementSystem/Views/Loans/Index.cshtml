@@ -1,0 +1,71 @@
+﻿@model List<LibraryManagementSystem.Models.Reader>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Loan Service</h2>
+
+@if (Model.Count == 0)
+{
+    <p>No Customer</p>
+}
+else
+{
+    <table class="table table-bordered table-hover" id="loans">
+        <thead>
+            <tr>
+                <th>Reader</th>
+                <th>Borrowed Book</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reader in Model)
+            {
+                <tr>
+                    <td>@reader.Name</td>
+                    <td>
+                        <table>
+                            @if (reader.BookLoans.Any())
+                            {
+                                foreach (var loan in reader.BookLoans)
+                                {
+                                    <tr >
+                                        <td class="d-inline-flex">
+                                            &#9642; @loan.Book.Name
+                                            @using (Html.BeginForm("Return", "Loans", new { id = loan.Id }))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <input class="btn btn-danger btn-sm mx-1 px-1 py-0" type="submit" value="Return"
+                                                       onclick="return confirm('Are you sure you wish to return this book?');" />
+                                            }
+                                        </td>
+                                    </tr>
+
+                                }
+
+                            }
+                            else
+                            {
+                                <tr><td>--</td></tr>
+                            }
+                        </table>
+                        
+                    </td>
+                    <td>@Html.ActionLink("New Loan", "Borrow", "Loans", new { id = reader.Id }, new { @class = "btn btn-primary" })</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            $("#loans").DataTable();
+        });
+    </script>
+}
+

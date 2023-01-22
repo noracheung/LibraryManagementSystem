@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+</head>
+<body>
+    <nav class="navbar navbar-expand-md  navbar-toggleable-md navbar-dark bg-primary">
+        <div class="container-fluid">
+            @Html.ActionLink("Library Management System", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapse"
+                    aria-controls="collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse text-center" id="collapse">
+                <ul class="navbar-nav flex-grow-1 align-items-center">
+                    <li>@Html.ActionLink("Readers", "Index", "Readers", null, new { @class = "nav-link" })</li>
+                    <li>@Html.ActionLink("Books", "Index", "Books", null, new { @class = "nav-link" })</li>
+                    @if (User.IsInRole("Librarian"))
+                    {
+                        <li>@Html.ActionLink("Book Loan Service", "Index", "Loans", null, new { @class = "nav-link" })</li>
+                    }
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li>@Html.ActionLink("Loan Service", "Index", "Loans", null, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("Manage User", "Index", "Admin", null, new { @class = "nav-link" })</li>
+
+                    }
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Library Management System</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/Lib")
+    @RenderSection("scripts", required: false)
+
+
+</body>
+</html>

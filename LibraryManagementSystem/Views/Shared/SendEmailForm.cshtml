@@ -1,0 +1,36 @@
+﻿@model LibraryManagementSystem.Models.EmailNotification
+
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h6 class="modal-title">An Email notification will be sent when "@Model.BookName" is returned and available for borrow</h6>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+            @using (Ajax.BeginForm("SetUpEmailNotification", "Books",
+                new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "msg", InsertionMode = InsertionMode.ReplaceWith }))
+            {
+                <div class="text-center" id="msg">
+                    <div class="modal-body">
+                        @Html.LabelFor(m => m.Email)
+                        @Html.TextBoxFor(m => m.Email) 
+                        @Html.ValidationMessageFor(m => m.Email)<br />
+
+                        @Html.LabelFor(m => m.BookName)
+                        @Html.TextBoxFor(m => m.BookName, new { @readonly = "", @style = "background-color:#f7f7f9" })
+
+                        @Html.HiddenFor(m => m.BookId)
+                        @Html.AntiForgeryToken()
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" id="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+
+            }
+        
+    </div>
+</div>
+

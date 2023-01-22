@@ -1,0 +1,40 @@
+﻿@model LibraryManagementSystem.ViewModels.NewLoanViewModel
+
+@{
+    ViewBag.Title = "LoanForm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewBag.Message</h2>
+
+@using (Html.BeginForm("Save", "Loans"))
+{
+    @Html.ValidationSummary(true, "Please fix the following errors:")
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Reader.Name)
+        @Html.TextBoxFor(m => m.Reader.Name, new { @class = "form-control bg-light text-dark", @readonly = "" })
+        @Html.ValidationMessageFor(m => m.Reader.Name)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.RentedBookId)
+        @Html.DropDownListFor(m => m.RentedBookId,
+            new SelectList(Model.Books, "Id", "Name"), "Select a Book: ",
+            new { @class = "form-control text-dark" })
+        @Html.ValidationMessageFor(m => m.RentedBookId)
+    </div>
+
+
+    @Html.HiddenFor(m => m.Reader.Id)
+    @Html.HiddenFor(m => m.Reader.Birthdate)
+    @Html.HiddenFor(m => m.Reader.Email)
+    @Html.AntiForgeryToken()
+
+    <button type="submit" class="btn btn-primary">Save</button>
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+}
+

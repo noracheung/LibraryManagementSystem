@@ -1,0 +1,28 @@
+﻿@model LibraryManagementSystem.Models.Reader
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@Model.Name</h2>
+<ul class="list-unstyled">
+    <li>Name: @Model.Name</li>
+    <li>Email: @Model.Email</li>
+</ul>
+
+<br />
+<br />
+@Html.ActionLink("View Loan Record", "ViewLoanRecord", "Readers", new { id = Model.Id }, new { @class = "btn btn-primary" })
+@Html.ActionLink("Edit", "Edit", "Readers", new { id = Model.Id }, new { @class = "btn btn-primary" })
+
+@using (Html.BeginForm("Delete", "Readers", new { id = Model.Id }, FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you wish to delete this user?')">Delete</button>
+}
+
+
+
+<br />
+<br />
+

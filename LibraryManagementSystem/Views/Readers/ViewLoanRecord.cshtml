@@ -1,0 +1,98 @@
+﻿@model LibraryManagementSystem.Models.Reader
+
+@{
+    ViewBag.Title = "ViewLoanRecord";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var current = Model.BookLoans.Where(b => b.ReturnDate == null);
+    var history = Model.BookLoans.Where(b => b.ReturnDate != null);
+
+}
+
+<h2 class="my-2">View Loan Record</h2>
+<br />
+
+@if (Model.BookLoans.Any())
+{
+    <h5>Currently Borrowed: </h5>
+    if (!current.Any())
+    {
+        <h5>null</h5>
+    }
+    else
+    {
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Borrow Date</th>
+                    <th>Due Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var bookloan in current)
+                {
+
+
+                    <tr>
+                        <td>@bookloan.Book.Name</td>
+                        <td>@bookloan.BorrowDate</td>
+                        <td class="duedate">@bookloan.DueDate</td>
+                    </tr>
+
+                }
+            </tbody>
+        </table>
+    }
+
+
+    <br />
+    <br />
+
+    <h5>Loan History: </h5>
+    if (!history.Any())
+    {
+        <h5>null</h5>
+    }
+    else
+    {
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Borrow Date</th>
+                    <th>Returned Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var bookloan in history)
+                {
+                    <tr>
+                        <td>@bookloan.Book.Name</td>
+                        <td>@bookloan.BorrowDate</td>
+                        <td>@bookloan.ReturnDate</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+}
+
+@section scripts
+    {
+    <script>
+        function warn() {
+
+            var dueDate = document.querySelectorAll(".duedate");
+            var today = new Date;
+            for (var i = 0; i < dueDate.length; i++) {
+                var due = dueDate[i].innerHTML.split("-")
+                var prevDate = new Date(due);
+                if (prevDate < today) {
+                    dueDate[i].style.color = "red";
+                }
+            }
+        }
+        warn();
+    </script>
+    }

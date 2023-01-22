@@ -1,0 +1,90 @@
+﻿@model List<LibraryManagementSystem.ViewModels.UserAndRoleViewModel>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<h2>All Users</h2>
+<p>@ViewBag.ErrorMessage</p>
+
+
+<table class="table table-bordered table-hover" id="roles">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Action</th>
+            <th>Role</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @for (var i = 0; i < Model.Count; i++)
+        {
+            <tr>
+                <td>@Model[i].User.Email</td>
+
+                <td>
+                    @Html.ActionLink("Edit", "Edit", "Admin", new { id = Model[i].User.Id }, new { @class = "btn btn-primary" })
+                    <button data-user-id="@Model[i].User.Id" class="btn btn-danger js-delete">Delete</button>
+                </td>
+                <td>
+                    <table>
+                        @foreach (var role in Model[i].Roles)
+                        {
+                            <tr>
+                                <td>&#9642; @role</td>
+                            </tr>
+                        }
+                    </table>
+
+                </td>
+
+
+                </tr>
+        }
+    </tbody>
+</table>
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+
+
+
+
+@section scripts
+    {
+    <script>
+        
+
+            $(document).ready(function () {
+                var myDataTable = $("#roles").DataTable();
+                $("#roles .js-delete").on("click", function () {
+                    var button = $(this);
+                    var result = confirm('Are you sure you wish to delete this reader?');
+                    if (result) {
+                        var form = $('#__AjaxAntiForgeryForm');
+                        var token = $('input[name="__RequestVerificationToken"]', form).val();
+                         $.ajax({
+                            url: "/Admin/DeleteUser/" + button.attr("data-user-id"),
+                            method: "POST",
+                            data: {
+                                __RequestVerificationToken: token
+                            },
+                            success: function () {
+                                myDataTable.row(button.parents("tr")).remove().draw();
+                            },
+                            statusCode: {
+                                500: function () {
+                                myDataTable.row(button.parents("tr")).remove().draw(false);
+                                }
+                            }
+                         });
+                    }
+                });
+            }); 
+    </script>
+}

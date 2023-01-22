@@ -1,0 +1,32 @@
+﻿@model List<LibraryManagementSystem.ViewModels.ManageUserRolesViewModel>
+@{
+    ViewBag.Title = "Edit Role";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var userId = ViewBag.Userid;
+}
+
+<h2>Edit Role for user: @ViewBag.Username</h2>
+<p>@ViewBag.ErrorMessage</p>
+
+@using (Html.BeginForm("Edit", "Admin" ))
+{
+    for (int i = 0; i < Model.Count; i++)
+    {
+        <div class="form-check">
+            <p>@Model[i].RoleName</p>
+            @Html.CheckBoxFor(m => Model[i].isSelected)
+            @Html.HiddenFor(m => Model[i].RoleId)
+            @Html.HiddenFor(m => Model[i].RoleName)
+            <br />
+        </div>
+
+        @Html.AntiForgeryToken()
+
+    }
+    @Html.HiddenFor(m => userId)
+    @Html.AntiForgeryToken()
+
+    <button type="submit" class="btn btn-primary">Save</button>
+
+}
+

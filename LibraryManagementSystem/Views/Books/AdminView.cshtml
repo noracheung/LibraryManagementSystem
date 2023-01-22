@@ -1,0 +1,138 @@
+﻿@model LibraryManagementSystem.ViewModels.BookSearchViewModel
+
+@{
+    ViewBag.Title = "Books";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var model = Model.Books;
+    var modelList = model.ToList();
+}
+
+<h2>Books</h2>
+@Html.ActionLink("New Book", "NewBook", "Books", null, new { @class = "btn btn-primary mb-2" })
+
+<br />
+<button class="btn btn-outline-secondary btn-sm float-end" data-bs-toggle="collapse" data-bs-target="#searchform">Filter</button>
+
+@using (Html.BeginForm("Index", "Books", FormMethod.Post, new { @class = "bg-primary bg-opacity-10 collapse my-3", id = "searchform" }))
+{
+    <div class="d-inline-flex">
+        <div class="form-group mx-2">
+            @Html.LabelFor(m => m.Name)
+            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+        </div>
+        <div class="form-group mx-2">
+            @Html.LabelFor(m => m.ISBN)
+            @Html.TextBoxFor(m => m.ISBN, new { @class = "form-control" })
+        </div>
+        <div class="form-group mx-2">
+            @Html.LabelFor(m => m.Author)
+            @Html.TextBoxFor(m => m.Author, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group mx-2">
+            @Html.LabelFor(m => m.BookTypeId)
+            @Html.DropDownListFor(m => m.BookTypeId, new SelectList(Model.BookTypes, "Id", "Type"), "Select a Book Type: ", new { @class = "form-control text-dark" })
+        </div>
+        <div class="form-group mx-2">
+            @Html.LabelFor(m => m.Available) <br />
+            @Html.CheckBoxFor(m => m.Available)
+        </div>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-outline-secondary btn-sm m-2">Search</button>
+}
+
+@if (!model.Any())
+{
+    <p>No Book!</p>
+}
+else
+{
+<table class="table table-bordered table-hover" id="books">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Books</th>
+            <th>Author</th>
+            <th>Type</th>
+            <th>Quantity</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        @for (var i = 0; i < modelList.Count(); i++)
+        {
+            var imagePath = "/UploadedFiles/" + modelList[i].FilePath;
+            <tr>
+                <td><img src=@imagePath  width="70"/></td>
+                <td>@Html.ActionLink(modelList[i].Name, "Details", "Books", new { id = modelList[i].Id }, new { @class = "text-decoration-none" })</td>
+                <td>@modelList[i].Author</td>
+                <td>@modelList[i].Type.Type</td>
+                <td>@modelList[i].NumberInStock</td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", "Books", new { id = @modelList[i].Id, }, new { @class = "btn btn-primary" })
+                    <button data-book-id="@modelList[i].Id" class="btn btn-danger js-delete book-delete">Delete</button>
+                    @if (modelList[i].NumberInStock == 0)
+                    {
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#emailform_@i">Email Me When Available</button>
+                        <div class="modal fade" id="emailform_@i" aria-hidden="true">
+                            @Html.Partial("SendEmailForm", new LibraryManagementSystem.Models.EmailNotification(@modelList[i].Name, @modelList[i].Id))
+                        </div>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+
+
+@section scripts
+    {
+    @*<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>*@
+
+    <script>
+        $(document).ready(function () {
+            var myDataTable = $("#books").DataTable({
+                "drawCallback": function (settings) {
+                    $("#books .book-delete").on("click", function (e) {
+                        var button = $(this);
+                        var result = confirm('Are you sure you wish to delete this book?');
+                        if (result) {
+                            var form = $('#__AjaxAntiForgeryForm');
+                            var token = $('input[name="__RequestVerificationToken"]', form).val();
+                            e.preventDefault();
+                            $.ajax({
+                                url: "/Books/Delete/" + button.attr("data-book-id"),
+                                method: "POST",
+                                data: {
+                                    __RequestVerificationToken: token
+                                },
+                                success: function () {
+                                    myDataTable.row(button.parents("tr")).remove().draw(false);
+                                    //location.reload();
+                                },
+                                statusCode: {
+                                    500: function () {
+                                        myDataTable.row(button.parents("tr")).remove().draw(false);
+                                        //location.reload();
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+    </script>
+    @Scripts.Render("~/bundles/jqueryval")
+
+}
